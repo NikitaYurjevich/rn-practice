@@ -1,14 +1,21 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
-import { Color } from "app/helpers/constants";
 import { useDispatch } from "react-redux";
 import TaskActions from "app/domains/tasks/store/taskActions";
 import AppButton from "app/components/AppButton.component";
 
-const AddTaskButton = () => {
-  const openModalHandler = () => {};
+const AddTaskButton = ({ ...rest}) => {
+  const dispatch = useDispatch();
+  const openModalHandler = () => {
+    dispatch(TaskActions.toggleModal({ action: "add", visible: true }));
+  };
 
-  return <AppButton />;
+  return (
+    <AppButton
+      text={"Добавить задачу"}
+      onPress={openModalHandler}
+      { ...rest }
+    />
+  );
 };
 
 export default AddTaskButton;

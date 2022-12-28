@@ -1,16 +1,16 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { ITask } from "app/domains/tasks/store/taskState";
 import { API_URL } from "app/App";
 import {
   AddTaskPayload,
   IGetTasksPayload,
+  IGetTasksResponse,
   RemoveTaskPayload,
 } from "app/domains/tasks/api/dto";
 
 export async function getTasksRequest({
   appId,
   token,
-}: IGetTasksPayload): Promise<AxiosResponse<ITask[]> | AxiosError> {
+}: IGetTasksPayload): Promise<AxiosResponse<IGetTasksResponse> | AxiosError> {
   return await axios.get(`${API_URL}/tasks/list`, {
     params: {
       appId,
@@ -31,6 +31,25 @@ export async function addTaskRequest(
       appId,
       userIds,
       name: taskName,
+      deadline: new Date(),
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+export async function removeTaskRequest(
+    payload: RemoveTaskPayload
+): Promise<AxiosResponse<string> | AxiosError> {
+  const { appId, taskId, token } = payload;
+  return await axios.post(
+    `${API_URL}/tasks/delete-task`,
+    {
+      appId,
+      ids: [taskId],
       deadline: new Date(),
     },
     {

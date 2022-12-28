@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Modal, View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Modal, View, StyleSheet } from "react-native";
 import AppInput from "app/components/AppInput.component";
 import { Color } from "app/helpers/constants";
 import AppButton from "app/components/AppButton.component";
@@ -17,9 +17,11 @@ const TaskAddingModal = () => {
 
   const { appId } = useSelector((state: IAppState) => state.auth);
   const dispatch = useDispatch();
-  const closeModalHandler = () => {};
+  const closeModalHandler = () => {
+    dispatch(TaskActions.toggleModal({ action: "add", visible: false }));
+  };
   const addTaskHandler = async (): Promise<void> => {
-    const requestPayload = {};
+    const requestPayload = { appId, userIds: [authInfo.userId], taskName, token: authInfo.access_token };
 
     try {
       await dispatch(TaskActions.addTask(requestPayload));
@@ -34,12 +36,25 @@ const TaskAddingModal = () => {
     <Modal visible={addTaskModalVisible} transparent={true}>
       <View style={styles.container}>
         <View style={styles.contentBox}>
-          <AppInput label={"Название задачи:"} keyboardType={"email-address"} />
-          <View>
+          <AppInput
+            value={taskName}
+            onChangeText={setTaskName}
+            label={"Название задачи:"}
+            keyboardType={"email-address"}
+          />
+          <View style={styles.actionsBox}>
+            <AppButton
+              mode={"outlined"}
+              disabled={isLoading}
+              text={"Закрыть"}
+              onPress={closeModalHandler}
+              btnStyles={styles.button}
+            />
             <AppButton
               disabled={isLoading}
               text={"Добавить"}
               onPress={addTaskHandler}
+              btnStyles={styles.button}
             />
           </View>
         </View>
@@ -65,4 +80,13 @@ const styles = StyleSheet.create({
     borderColor: Color.text,
     borderRadius: 15,
   },
+  actionsBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 20,
+  },
+  button: {
+    margin: 5,
+  }
 });
