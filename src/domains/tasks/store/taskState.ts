@@ -88,7 +88,7 @@ export interface IFile {
   view: string;
 }
 
-export interface ToggleModal {
+export interface IToggleModal {
   action: "add" | "remove";
   visible: boolean;
 }

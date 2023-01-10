@@ -1,7 +1,5 @@
 import taskInitialState, {
-  ITask,
-  ITasksState,
-  ToggleModal,
+  ITasksState, IToggleModal,
 } from "app/domains/tasks/store/taskState";
 import TaskActions from "app/domains/tasks/store/taskActions";
 import {
@@ -9,7 +7,7 @@ import {
   reducerWithInitialState,
 } from "typescript-fsa-reducers";
 import { Success } from "typescript-fsa";
-import { IGetTasksPayload } from "app/domains/tasks/api/dto";
+import { IGetTasksPayload, IGetTasksResponse } from "app/domains/tasks/api/dto";
 
 const getTaskStarted = (state: ITasksState): ITasksState => {
   return {
@@ -19,7 +17,7 @@ const getTaskStarted = (state: ITasksState): ITasksState => {
 };
 const getTaskDone = (
   state: ITasksState,
-  payload: Success<IGetTasksPayload, ITask[]>
+  payload: Success<IGetTasksPayload, IGetTasksResponse>
 ): ITasksState => {
   return {
     ...state,
@@ -41,10 +39,9 @@ const addTaskDone = (state: ITasksState): ITasksState => {
   };
 };
 
-const toggleModal = (state: ITasksState, payload: ToggleModal): ITasksState => {
+const toggleModal = (state: ITasksState, payload: IToggleModal): ITasksState => {
   const { action, visible } = payload;
-
-  const newState = { ...state };
+  const newState: any = { ...state };
   newState[`${action}TaskModalVisible`] = visible;
 
   return newState;
@@ -58,4 +55,7 @@ export const taskReducer: ReducerBuilder<ITasksState> = reducerWithInitialState(
   .case(TaskActions.getTasks.async.failed, getTaskFailed)
   .case(TaskActions.addTask.async.started, getTaskStarted)
   .case(TaskActions.addTask.async.done, addTaskDone)
-  .case(TaskActions.addTask.async.failed, getTaskFailed);
+  .case(TaskActions.addTask.async.failed, getTaskFailed)
+  .case(TaskActions.toggleModal, toggleModal);
+
+

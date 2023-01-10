@@ -19,6 +19,6 @@ const App = () => {
   );
 };
 
-export const API_URL = "";
+export const API_URL = "https://dacon.kaminsoft.ru/a/sm_hs/hs/dacon-api";
 
 export default App;

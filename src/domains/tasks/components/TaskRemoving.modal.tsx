@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
-import AppInput from "app/components/AppInput.component";
 import { Color } from "app/helpers/constants";
 import AppButton from "app/components/AppButton.component";
 import { useDispatch, useSelector } from "react-redux";
 import TaskActions from "app/domains/tasks/store/taskActions";
 import { IAppState } from "app/store";
+import { ITask } from "app/domains/tasks/store/taskState";
 
-const TaskRemovingModal = () => {
+interface IProps {
+  task?: ITask;
+}
+
+const TaskRemovingModal = ( { task }: IProps) => {
   const { removeTaskModalVisible } = useSelector(
     (state: IAppState) => state.tasks
   );
@@ -15,16 +19,19 @@ const TaskRemovingModal = () => {
 
   const { appId } = useSelector((state: IAppState) => state.auth);
   const dispatch = useDispatch();
-  const closeModalHandler = () => {};
+  const closeModalHandler = () => {
+    dispatch(TaskActions.toggleModal({ action: "remove", visible: false }));
+  };
   const removeTaskHandler = async (): Promise<void> => {
-    const requestPayload = {};
-
-    try {
-      // Запрос на удаление
-      closeModalHandler();
-      dispatch(TaskActions.getTasks({ appId, token: authInfo.access_token }));
-    } catch (e) {
-      console.log("Error : ", JSON.stringify(e));
+    if (task) {
+      const requestPayload = { appId, taskId: task.id, token: authInfo.access_token };
+      try {
+        await dispatch(TaskActions.removeTask(requestPayload));
+        closeModalHandler();
+        dispatch(TaskActions.getTasks({ appId, token: authInfo.access_token }));
+      } catch (e) {
+        console.log("Error : ", JSON.stringify(e));
+      }
     }
   };
 
@@ -34,13 +41,19 @@ const TaskRemovingModal = () => {
         <View style={styles.contentBox}>
           <Text
             style={styles.title}
-          >{`Удалить задачу "${"<имя задачи>"}"?`}</Text>
+          >
+            {`Удалить задачу "${task?.name}"?`}</Text>
           <View style={styles.actionsBox}>
             <AppButton
               mode={"outlined"}
               text={"Отмена"}
               onPress={closeModalHandler}
               btnStyles={{ marginHorizontal: 8 }}
+            />
+            <AppButton
+                text={"Удалить"}
+                onPress={removeTaskHandler}
+                btnStyles={{ marginHorizontal: 8 }}
             />
           </View>
         </View>
